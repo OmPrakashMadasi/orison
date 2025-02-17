@@ -21,8 +21,8 @@ DEBUG = True
 ALLOWED_HOSTS = ['orison.onrender.com', 'www.orison.onrender.com', '127.0.0.1',]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://orisontrial.onrender.com',
-    'https://www.orisontrial.onrender.com'
+    'https://orison.onrender.com',
+    'https://www.orison.onrender.com'
 ]
 
 # Application definition
