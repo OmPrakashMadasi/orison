@@ -14,6 +14,9 @@
         <!-- <h3>Products - <small class="card-text text-primary" > <b>{{ school.name }}</b> </small> </h3> -->
         <ul class="nav flex-column" >
             <span style="color:black;font-size: 30px;">All products</span>
+            <li class="nav-item">
+    <a style="cursor:pointer" class="nav-link text-white" onclick="showAllProducts()">All Products</a>
+</li>
             {% for category in categories %}
                 <li class="nav-item" >
                     <a style="cursor:pointer" class="nav-link text-white" onclick="showProducts('{{ category.slug }}')">{{ category.name }}</a>
@@ -95,7 +98,7 @@
                 {% for product in products %}
                     <div class="col-md-4 mb-4 productCategory {{ category.slug }}" style="display: none;">
 
-                        <div class="card p-4">
+                        <div class="card p-10">
                             <!-- Product Image -->
                             <!-- <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: contain;"> -->
                             <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: contain; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
@@ -169,6 +172,10 @@
     </div>
     <div class="offcanvas-body">
         <ul class="nav flex-column" >
+            <!-- All Products Link -->
+            <li class="nav-item">
+                <a data-bs-dismiss="offcanvas" style="cursor:pointer" class="nav-link" onclick="showAllProducts()">All Products</a>
+            </li>
             {% for category in categories %}
                 <li class="nav-item">
                     <a data-bs-dismiss="offcanvas" style="cursor:pointer" class="nav-link" onclick="showProducts('{{ category.slug }}')">{{ category.name }}</a>
@@ -179,6 +186,16 @@
 </div>
 
 <script>
+    function showAllProducts() {
+    // Hide the default content and show the products container
+    document.getElementById('defaultContent').style.display = 'none';
+    document.getElementById('productsContainer').style.display = 'block';
+
+    // Show all the products regardless of category
+    const allCategories = document.querySelectorAll('.productCategory');
+    allCategories.forEach(category => category.style.display = 'block');  // Show all products
+}
+
     document.getElementById('productsContainer').style.display = 'none';
 
     function showProducts(categorySlug) {
