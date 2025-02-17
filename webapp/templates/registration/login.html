@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center">
+    <h4 class="display-6 text-black">Log-in for {{ school.name }}</h4>
+</div>
+
+<div class="form-container" style="margin-top: 20px;">
+    <h2>Login</h2>
+
+    <!-- Display error messages if any -->
+    {% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <center>
+    <span class="text-sm-center" ><a class="text-muted" href="{% url 'register' slug=school.slug %}">New to the School? <span class="text-alert">Click here!</span></a> </span>
+
+    </center>
+     <hr/>
+
+    <!-- Login form -->
+    <form id="loginForm" method="post" action="{% url 'login' slug=school.slug %}">
+        {% csrf_token %}
+
+        <!-- Username, Email, or Mobile -->
+        <label for="username_or_email_or_mobile">Username / Email / Mobile</label>
+        <input type="text" id="username_or_email_or_mobile" name="username_or_email_or_mobile" required autocomplete="off" placeholder="Enter your username, email, or mobile" style="width: 100%;" value="{{ request.POST.username_or_email_or_mobile|default:'' }}">
+
+        <!-- Password -->
+        <div class="input-group mb-4  mb-3 position-relative">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="off">
+                    <i class="fa fa-eye position-absolute" id="togglePassword1" style="right: 10px; top: 50%; transform: translateY(-20%); cursor: pointer;" onclick="togglePasswordVisibility('password', 'togglePassword1')"></i>
+        </div>
+        <!-- Submit Button -->
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </div>
+    </form>
+</div>
+
+<div class="text-center mt-3">
+    <button class="btn btn-reset" type="reset">
+        <a href="{% url 'password_reset' %}">Forgot Password</a>
+    </button>
+</div>
+
+
+<script>
+    function togglePasswordVisibility(passwordFieldId, toggleIconId) {
+        var passwordField = document.getElementById(passwordFieldId);
+        var toggleIcon = document.getElementById(toggleIconId);
+
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        } else {
+            passwordField.type = "password";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        }
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Background Overlay -->
+<div id="backgroundOverlay" class="overlay"></div>
+<button class="btn btn-dark d-block d-md-none mt-4" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"
+    aria-controls="offcanvas" style="margin-left: 10px;">Menu</button>
+
+<div class="main-container d-flex" style="height: 650px;" id="mainContent">
+    <!-- Left Sidebar for Large Devices (Hidden on mobile) -->
+    <div class="left-sidebar d-none d-md-block"
+        style="width: 250px; height: 100%; background-color: #000; color: white; padding: 20px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); flex-shrink: 0;">
+        <h3>Products</h3>
+        <ul class="nav flex-column">
+            {% for category in categories %}
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#" onclick="showProducts('{{ category.slug }}')">{{ category.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Right Content (Main Product Display Area) -->
+    <div id="productDisplay" class="right-content mx-auto"
+        style="flex-grow: 1; padding: 20px; height: 100%; overflow-y: auto;">
+
+        <!-- Default Welcome Text and Image (Visible on page load) -->
+        <div id="defaultContent">
+            <img src="https://media.istockphoto.com/id/521814034/vector/three-kids-in-school-uniform-going-to-school.jpg?s=612x612&w=0&k=20&c=rTIZiRpnkhwdqH23daZmsGPdAWXUpii8koa966rdVwA="
+                class="responsive-image img-fluid " style="width: 300px; height: auto; object-fit: contain;" />
+            <h1 id="welcomeText">Welcome to the Products</h1>
+        </div>
+
+        <!-- Product Categories (Initially Hidden) -->
+        <div id="productsContainer" class="row d-flex justify-content-start" style="display: none;">
+            {% for category, products in products_by_category.items %}
+                {% for product in products %}
+                    <div class="col-md-4 mb-4 productCategory {{ category.slug }}" style="display: none;">
+                        <div class="card">
+                            <!-- Adjusting Image Size -->
+                            <img src="{{ product.image.url }}"
+                                class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit:contain;">
+
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text">{{ product.description }}</p>
+                                <p class="card-text">{{ product.price }}</p>
+                                <div style="display: flex;">
+                                    <button class="btn bg-dark text-light">Add to Cart</button>
+                                    <div class="ms-3" style="display: flex; align-items: center; gap: 5px;">
+                                        <!-- Label for Quantity -->
+                                        <label for="shirtQuantity" class="form-label mb-0"
+                                            style="font-size: 14px;">Quantity:</label>
+
+                                        <!-- Quantity Dropdown -->
+                                        <select class="form-select" id="shirtQuantity"
+                                            style="width: 80px; height: 35px; font-size: 14px;">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="3">3</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="w-100 mb-3">
+                                    <label for="size" class="form-label">Select Size:</label>
+                                    <select name="size" id="size">
+                                        <option value="" disabled selected>Select Size</option>
+                                        {% for size in product.sizes.all %}
+                                            <option value="{{ size.id }}">{{ size.size }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Offcanvas for Mobile Devices -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel"
+    style="width: 300px;background-color:white;margin-top: 85px;">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasLabel">Products</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="nav flex-column">
+            {% for category in categories %}
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="showProducts('{{ category.slug }}')">{{ category.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<script>
+    document.getElementById('productsContainer').style.display = 'none';
+
+    function showProducts(category) {
+        document.getElementById('defaultContent').style.display = 'none';
+        document.getElementById('productsContainer').style.display = 'block';
+
+        const allCategories = document.querySelectorAll('.productCategory');
+        allCategories.forEach(category => category.style.display = 'none');
+
+        const selectedCategory = document.querySelectorAll('.' + category);
+        selectedCategory.forEach(product => product.style.display = 'block');
+    }
+</script>
+{% endblock %}

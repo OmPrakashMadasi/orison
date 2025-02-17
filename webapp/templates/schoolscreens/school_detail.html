@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Background Overlay -->
+<div id="backgroundOverlay" class="overlay"></div>
+<button class="btn btn-dark d-block d-md-none mt-4" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"
+    aria-controls="offcanvas" style="margin-left: 10px;">Menu</button>
+
+<div class="main-container d-flex" style="height: 650px;" id="mainContent">
+    <!-- Left Sidebar for Large Devices (Hidden on mobile) -->
+    <div class="left-sidebar d-none d-md-block"
+        style="width: 250px; height: auto; background-color:#76835e; color: white; padding: 20px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); flex-shrink: 0;">
+        <!-- <h3>Products - <small class="card-text text-primary" > <b>{{ school.name }}</b> </small> </h3> -->
+        <ul class="nav flex-column" >
+            <span style="color:black;font-size: 30px;">All products</span>
+            {% for category in categories %}
+                <li class="nav-item" >
+                    <a style="cursor:pointer" class="nav-link text-white" onclick="showProducts('{{ category.slug }}')">{{ category.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Right Content (Main Product Display Area) -->
+    <div id="productDisplay" class="right-content mx-auto"
+        style="flex-grow: 1; padding: 20px; height: 100%; overflow-y: auto;">
+
+        <!-- Default Welcome Text and Image (Visible on page load) -->
+        <div id="defaultContent">
+            <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img
+          src="{% static 'images/slider1.jpg' %}"
+          class="d-block w-100" height="400px" alt="Image 1" onerror="this.src='https://placehold.co/800x200'" style="border-radius: 10px;">
+      </div>
+      <div class="carousel-item">
+        <img
+          src="{% static 'images/slider2.jpg' %}"
+          class="d-block w-100" height="400px" alt="Image 2" onerror="this.src='https://placehold.co/800x200'" style="border-radius: 10px;">
+      </div>
+      <div class="carousel-item">
+        <img
+          src="{% static 'images/slider3.jpg' %}"
+          class="d-block w-100" height="400px" alt="Image 3" onerror="this.src='https://placehold.co/800x200'" style="border-radius: 10px;">
+      </div>
+        <div class="carousel-item">
+        <img
+          src="{% static 'images/slider4.jpg' %}"
+          class="d-block w-100" height="400px" alt="Image 4" onerror="this.src='https://placehold.co/800x200'" style="border-radius: 10px;">
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+            <h1 id="welcomeText">Welcome to the Products {{ school.name }}</h1>
+        </div>
+
+
+        <!-- Product Categories (Initially Hidden) -->
+        <div id="productsContainer" class="row d-flex justify-content-start" style="display: none;background-color: #f8ffe5;padding: 4px;">
+            <div style="display: flex;justify-content: space-between;">
+                <h3>Products - <small class="card-text text-primary" > <b>{{ school.name }}</b> </small> </h3>
+                <a href="#" class="text-decoration-none d-inline-block mt-2 px-3 py-2 fs-20 fw-bold text-black rounded-3
+                transition-all hover:bg-secondary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSizeChart" aria-controls="offcanvasSizeChart">
+                <!-- <i class="bi bi-arrow-right-circle" style="color:blue; font-size: 30px; transition: color 0.3s;"></i> -->
+                <img src="https://img.freepik.com/premium-vector/hand-drawn-sketch-illustration-measuring-tape-centimeter-tape-vector-sketch-illustration_231873-3718.jpg?semt=ais_hybrid"
+                class="border border-gray"
+                style="width: 50px; height: 50px; margin-right: -53px; transition: border-color 0.3s ease-in-out;" />
+              
+             </a>
+
+
+            </div>
+<!-- Offcanvas for size chart -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasSizeChart" aria-labelledby="offcanvasSizeChartLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasSizeChartLabel">Size Chart</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <!-- Placeholder for size chart image -->
+    <img src="{% static 'images/sizechart.jpg' %}" alt="Size Chart Image" class="img-fluid">
+  </div>
+</div>
+
+            {% for category, products in products_by_category.items %}
+                {% for product in products %}
+                    <div class="col-md-4 mb-4 productCategory {{ category.slug }}" style="display: none;">
+
+                        <div class="card p-4">
+                            <!-- Product Image -->
+                            <!-- <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: contain;"> -->
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: contain; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+
+                            <div class="card-body">
+                                <form method="post" action="{% url 'add_to_cart' product.id %}">
+                                    {% csrf_token %}
+
+                                    <h5 class="card-title">{{ product.name }}</h5>
+                                    <p class="card-text text-danger">{{ product.description }}</p>
+
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <!-- Quantity Dropdown -->
+                                        <div class="ms-3 d-flex align-items-center" style="width: 50%;">
+                                            <select required name="quantity" class="form-select w-100" id="quantity-{{ product.id }}" style="height: 35px; font-size: 14px;">
+                                                <option value="" disabled selected >Enter Quantity</option>
+                                                {% for i in "1234"|make_list %}
+                                                    <option value="{{ i }}" {% if i == 1 %} selected {% endif %}>
+                                                        {{ i }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        {% if category.size.exists %}
+                                        <!-- Size Dropdown -->
+                                        <div class="ms-2 d-flex flex-column align-items-start" style="width: 50%;">
+                                            <div>
+                                            <!-- <a href="#" class="text-decoration-none size-chart-link" data-target="sizeChartPopup-{{ product.id }}" style="margin-bottom: 10px;">Size chart</a> -->
+
+                                            </div>
+                                            <select class="form-select w-100" name="size" id="size-{{ product.id }}" required style="height: 35px; font-size: 14px;">
+                                                <option value="" disabled selected>Select Size</option>
+                                                {% for size in category.size.all %}
+                                                    <option value="{{ size.id }}">{{ size.size }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Add to Cart Button -->
+                                    <div class="d-flex justify-content-center mt-3">
+                                        <button type="submit" class="btn text-light" style="width: 200px;background-color: rgb(22, 22, 52);">Add to Cart</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Size Chart Popup -->
+                            <!-- <div id="sizeChartPopup-{{ product.id }}" class="position-fixed top-10 start-50 translate-middle-x p-3 bg-white shadow-lg rounded" style="display: none; width: 90%; max-width: 500px; z-index: 1000;">
+                                <button class="close-size-chart border-0 bg-transparent text-danger fs-4" style="float: right; cursor: pointer;">&times;</button>
+                                <h5>Size Chart</h5>
+                                <img src="{% static 'images/sizechart.jpg' %}" alt="Size Chart Image" class="img-fluid">
+                            </div> -->
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Offcanvas for Mobile Devices -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel"
+    style="width: 300px;background-color:white;margin-top: 85px;">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasLabel">Products</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="nav flex-column" >
+            {% for category in categories %}
+                <li class="nav-item">
+                    <a data-bs-dismiss="offcanvas" style="cursor:pointer" class="nav-link" onclick="showProducts('{{ category.slug }}')">{{ category.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<script>
+    document.getElementById('productsContainer').style.display = 'none';
+
+    function showProducts(categorySlug) {
+        localStorage.setItem('selectedCategory', categorySlug);  // Save the selected category
+
+        document.getElementById('defaultContent').style.display = 'none';
+        document.getElementById('productsContainer').style.display = 'block';
+
+        const allCategories = document.querySelectorAll('.productCategory');
+        allCategories.forEach(category => category.style.display = 'none');
+
+        const selectedCategory = document.querySelectorAll('.' + categorySlug);
+        selectedCategory.forEach(product => product.style.display = 'block');
+    }
+
+    document.querySelectorAll('.size-chart-link').forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            const targetId = this.dataset.target;
+            document.getElementById(targetId).style.display = 'block';
+        });
+    });
+
+    document.querySelectorAll('.close-size-chart').forEach(button => {
+        button.addEventListener('click', function() {
+            this.closest('div').style.display = 'none';
+        });
+    });
+
+    // Check if there is a selected category in localStorage and show it on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedCategory = localStorage.getItem('selectedCategory');
+        if (savedCategory) {
+            showProducts(savedCategory);
+        }
+    });
+</script>
+
+
+{% endblock %}

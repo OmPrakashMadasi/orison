@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+<div class="form-container" style="margin-top: 30px;">
+    <h2>Register for {{ school.name }} </h2>
+    <!-- Display error messages if any -->
+    {% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <center>
+    <span class="text-sm-center" ><a class="text-muted" href="{% url 'login' slug=school.slug %}">Already have an account? <span class="text-alert"> Click here!</span></a> </span>
+    </center>
+        <hr/>
+    <form id="registerForm" method="post" action="{% url 'register' slug=school.slug %}">
+        {% csrf_token %}
+
+        <!-- Username -->
+        {{ form.username.help_text|safe }}
+        <label for="{{ form.username.id_for_label }}">Username</label>
+        <div class="input-group mb-1">
+        {{ form.username }}
+        </div>
+        <!-- Email -->
+        {{ form.email.help_text|safe }}
+        <label for="{{ form.email.id_for_label }}">Email</label>
+        <div class="input-group mb-1">
+        {{ form.email }}
+        </div>
+        <!-- Mobile Number -->
+        <label for="{{ form.mobile_number.id_for_label }}">Mobile Number</label>
+        <div class="input-group mb-1">
+        {{ form.mobile_number }}
+        </div>
+        <!-- Password -->
+        <div class="input-group mb-4  mb-3 position-relative">
+        {{ form.password1.help_text|safe }}
+        <label for="{{ form.password1.id_for_label }}">Password</label>
+        <div class="input-group mb-1">
+        {{ form.password1 }}
+            <i class="fa fa-eye position-absolute" id="togglePassword1" style="right: 10px; top: 50%; transform: translateY(-80%); cursor: pointer;" onclick="togglePasswordVisibility('id_password1', 'togglePassword1')"></i>
+        </div>
+        </div>
+        <!-- Confirm Password -->
+        {{ form.password2.help_text|safe }}
+        <div class="input-group mb-4 mb-3 position-relative">
+         <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+        <div class="input-group mb-1">
+        {{ form.password2 }}
+            <i class="fa fa-eye position-absolute" id="togglePassword2" style="right: 10px; top: 50%; transform: translateY(-80%); cursor: pointer;" onclick="togglePasswordVisibility('id_password2', 'togglePassword2')"></i>
+        </div>
+            </div>
+        <!-- Submit Button -->
+        <button type="submit">Register</button>
+    </form>
+
+</div>
+<div class="d-flex justify-content-center mt-1">
+    If you already have an Account :-&nbsp;
+    <form action="{% url 'login' slug=school.slug %}">
+        <button class="btn btn-primary" style="background-color: black; color:white;width: 180px;">
+            Click here to Login
+        </button>
+    </form>
+</div>
+<div class="text-center" >
+    <button class="btn btn-reset" type="reset" ><a href="{% url 'password_reset' %}">Forgot Password</a></button>
+</div>
+
+
+<script>
+    function togglePasswordVisibility(inputId, toggleIconId) {
+        const passwordField = document.getElementById(inputId);
+        const toggleIcon = document.getElementById(toggleIconId);
+
+        // Toggle between password and text types
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        } else {
+            passwordField.type = "password";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        }
+    }
+</script>
+
+<style>
+    .form-container {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-container label {
+        font-size: 14px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .form-container input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .form-container button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .form-container button:hover {
+        background-color: #45a049;
+    }
+
+    .error {
+        color: red;
+        font-size: 12px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}

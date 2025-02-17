@@ -1,0 +1,84 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg" style="font-size:18px;">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}">
+      {% if user.is_authenticated %}
+      <img src="{% static 'images/Orison.jpeg' %}" alt="Orison Logo" class="navbar-logo"
+        style="width:150px; height:auto; border-radius:50%;">
+      {% else %}
+      <img src="{% static 'images/Orison.jpeg' %}" alt="Orison Logo" class="navbar-logo"
+        style="width:150px; height:auto; border-radius:50%;">
+      {% endif %}
+    </a>
+    <button class="navbar-toggler bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto d-flex flex-row gap-4 mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'home' %}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Go to Home Page">
+              Home
+          </a>
+      </li>
+        {% if not user.is_authenticated %}
+        <li class="nav-item dropdown" id="schoolDropdown">
+          <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button"
+            data-bs-toggle="dropdown">Schools</a>
+          <ul class="dropdown-menu">
+            {% for school in schools %}
+            <li>
+              <a class="dropdown-item" href="{% url 'register' slug=school.slug %}">
+                <div class="btn btn-outline-primary">
+                  <span>{{ school.name }}</span>
+                </div>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endif %}
+        {% if user.is_authenticated %}
+        {% if school %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'school_detail' slug=school.slug %}">Products</a></li>
+        {% endif %}
+        {% endif %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About Us</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact Us</a></li>
+
+      </ul>
+      {% if not user.is_authenticated %}
+      <form class="d-flex" role="search" method="get" style="justify-content: center;">
+        <input class="form-control me-2" type="text" name="query" id="searchInput" placeholder="Search..."
+          style="width: 300px; height: 35px; font-size: 15px;" required>
+        <button class="btn small-search-button" type="submit" style="border-color: white; color: white;">Search</button>
+      </form>
+      {% else %}
+      <div class="d-flex align-items-center gap-4 ms-auto">
+        <a class="d-flex align-items-center position-relative" href="{% url 'cart_summary' slug=school.slug %}">
+          <i class="bi bi-cart-fill mb-1 position-relative" style="font-size: 25px; color: white;"></i>
+          <span class="badge bg-danger text-white ms-1 rounded-pill position-absolute top-0 start-100 translate-middle"
+            id="cart_quantity" style="font-size: 10px;">{{ cart_count }}</span>
+        </a>
+        <a href="{% url 'logout' %}" class="btn btn-light me-3 position-relative logout-btn">
+          Log-Out <i class="bi bi-box-arrow-right"></i>
+        </a>
+
+      </div>
+
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<script>
+  document.getElementById('schoolDropdown').addEventListener('mouseover', function () {
+    var dropdownMenu = this.querySelector('.dropdown-menu');
+    dropdownMenu.classList.add('show');
+  });
+
+  document.getElementById('schoolDropdown').addEventListener('mouseleave', function () {
+    var dropdownMenu = this.querySelector('.dropdown-menu');
+    dropdownMenu.classList.remove('show');
+  });
+  
+</script>

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<h2 class="mt-4 text-center text-danger">Product Details</h2>
+<div class="container mt-5" style="background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
+
+
+    <div class="row">
+        <!-- Image Section -->
+        <div class="col-md-6 d-flex align-items-center justify-content-center">
+            <img src="https://5.imimg.com/data5/RM/UE/XD/IOS-3325248/product-jpeg-500x500.png" alt="Product Image"
+                class="img-fluid" style="object-fit: contain; border: 1px solid #2d4f85; padding: 10px; max-height: 400px;">
+        </div>
+
+        <!-- Product Details Section -->
+        <div class="col-md-6">
+            <h3>PREP Shorts (Boys)</h3>
+            <p class="text-muted">Product Code: PSB1234</p>
+<!--            <h4 class="text-primary">₹600</h4>-->
+
+            <!-- Size Selection -->
+            <div class="mt-4">
+                <div class="d-flex justify-content-between">
+                    <label for="size" class="form-label">Select Size</label>
+                    <a href="#" id="openSizeChart" class="text-decoration-none">Size chart</a>
+                </div>
+                <select class="form-select" name="size" id="size">
+                    <option value="" disabled selected>Select Size</option>
+                    <option value="20">20</option>
+                    <option value="40">40</option>
+                    <option value="60">60</option>
+                    <option value="80">80</option>
+                    <option value="12">12</option>
+                    <option value="16">16</option>
+                </select>
+            </div>
+
+            <!-- Quantity Selection -->
+            <div class="mt-4">
+                <label for="quantity" class="form-label">Quantity</label>
+                <div class="input-group" style="width: 120px;background-color:#2d4f85;">
+                    <button class="btn" style="border: none;color: white;" type="button" onclick="decrementQuantity()">-</button>
+                    <input type="text" class="form-control text-center" id="quantityDisplay" value="1" readonly>
+                    <button class="btn" style="border: none;color: white;" type="button" onclick="incrementQuantity()">+</button>
+                </div>
+            </div>
+
+            <!-- Add to Cart Button -->
+            <div class="mt-4">
+                <a href="#" class="btn w-50" style="background-color: rgb(236, 126, 70);color: white;">Add to Cart</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Size Chart Popup -->
+<div id="sizeChartPopup"
+    style="display: none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); z-index: 1000; border-radius: 10px;">
+    <button id="closeSizeChart" style="border: none; background: none; font-size: 24px; color: red; cursor: pointer; float: right;">&times;</button>
+    <h5>Size Chart</h5>
+    <img src="https://clothesjunction.in/cdn/shop/files/CJ_Size_Chart.jpg?v=1720699180&width=1200" alt="Size Chart Image"
+        class="img-fluid">
+</div>
+
+<!-- JavaScript for Increment/Decrement and Popup -->
+<script>
+    function incrementQuantity() {
+        let quantityDisplay = document.getElementById('quantityDisplay');
+        let currentQuantity = parseInt(quantityDisplay.value);
+        quantityDisplay.value = currentQuantity + 1;
+    }
+
+    function decrementQuantity() {
+        let quantityDisplay = document.getElementById('quantityDisplay');
+        let currentQuantity = parseInt(quantityDisplay.value);
+        if (currentQuantity > 1) {
+            quantityDisplay.value = currentQuantity - 1;
+        }
+    }
+
+    document.getElementById("openSizeChart").addEventListener("click", function (event) {
+        event.preventDefault();
+        document.getElementById("sizeChartPopup").style.display = "block";
+    });
+
+    document.getElementById("closeSizeChart").addEventListener("click", function () {
+        document.getElementById("sizeChartPopup").style.display = "none";
+    });
+</script>
+{% endblock %}

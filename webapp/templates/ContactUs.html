@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Contact Us Header -->
+<div class="container-fluid  py-5 text-center" style="background-color: whitesmoke;color: black;">
+    <h1 class="fw-bold">Contact Us</h1>
+    <p class="lead">We are here to help! Get in touch with us for any queries.</p>
+</div>
+
+
+<!-- FAQ Section -->
+<div class="container py-5">
+    <h3 class="fw-bold text-center mb-4">Frequently Asked Questions (FAQ)</h3>
+    <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                    How can I track my order?
+                </button>
+            </h2>
+            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Once your order is dispatched, we will provide a tracking link via whatsapp.
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                    Do you offer international shipping?
+                </button>
+            </h2>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    No, we ship Localwise. Shipping rates vary based on location.
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                    What is your return policy?
+                </button>
+            </h2>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    We accept returns within 7 days of purchase, provided the items are in original condition.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Contact Us Section -->
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Left Column: Contact Information -->
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0 bg-dark text-white p-4">
+                <h3 class="fw-bold">Get in Touch</h3>
+                <p class="text-white-50">Have questions? Reach out to us via phone, email, or visit our office.</p>
+
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-telephone-fill me-2"></i> <a href="tel:+919959078185" class="text-white">9959078185</a>, <a href="tel:+919701732884" class="text-white">9701732884</a></li>
+                    <!-- <li><i class="bi bi-envelope-fill me-2"></i> <a href="mailto:info@example.com" class="text-white">info@example.com</a></li> -->
+                    <li  style="margin-top: 10px;"><i class="bi bi-geo-alt-fill me-2"></i> 3-4-1/3/2, Balajanagar, Ramanthapur, Hyderabad-500013</li>
+                </ul>
+
+                <div class="mt-3">
+                    <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-4"></i></a>
+                    <a href="#" class="text-white me-3"><i class="bi bi-twitter fs-4"></i></a>
+                    <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-4"></i></a>
+                </div>
+
+                <hr class="text-white">
+
+                <h4 class="fw-bold">Business Hours</h4>
+                <p class="text-white-50 mb-0">Monday - Friday: 9:00 AM - 6:00 PM</p>
+                <p class="text-white-50">Saturday - Sunday: Closed</p>
+            </div>
+        </div>
+
+        <!-- Right Column: Contact Form -->
+        <div class="col-md-7">
+            <div class="card shadow-lg border-0 p-4">
+                <h4 class="mb-3">Send Us a Message</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required style="width:260px;">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Your Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Your Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-dark">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Google Map -->
+<div class="container">
+    <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509825!2d144.95373531590463!3d-37.81627974202151!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad65d5df1a63f5f%3A0x5045675218ce820!2sMelbourne%20VIC%2C%20Australia!5e0!3m2!1sen!2sin!4v1605234009947!5m2!1sen!2sin" 
+        width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy">
+    </iframe>
+</div>
+
+{% endblock %}

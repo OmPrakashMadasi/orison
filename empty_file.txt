@@ -1,0 +1,167 @@
+def login_user(request, slug):
+
+    school = get_object_or_404(School, slug=slug)
+    schools = School.objects.all()
+
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+
+        if form.is_valid():
+            username_or_email_or_mobile = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+
+            # Try to authenticate using username first
+            user = authenticate(request, username=username_or_email_or_mobile, password=password)
+
+            # If authentication fails using username, try email
+            if user is None:
+                try:
+                    user = authenticate(request, username=Profile.objects.get(email=username_or_email_or_mobile).user.username, password=password)
+                except Profile.DoesNotExist:
+                    pass  # Handle invalid email
+
+            # If authentication fails using email, try mobile number
+            if user is None:
+                try:
+                    profile = Profile.objects.get(mobile_number=username_or_email_or_mobile)
+                    user = authenticate(request, username=profile.user.username, password=password)
+                except Profile.DoesNotExist:
+                    pass  # Handle invalid mobile number
+
+            # After authentication, check if the user is valid and belongs to the selected school
+            if user is not None:
+                profile = Profile.objects.get(user=user)
+                if profile.school.id == school.id:
+                    login(request, user)
+                    return redirect('school_detail', slug=school.slug)
+                else:
+                    form.add_error(None, 'Please check the school')
+            else:
+                form.add_error(None, 'Invalid Credentials')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'registration/login.html', {'schools': schools, 'form': form, 'school': school})
+
+
+
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div id="backgroundOverlay" class="overlay"></div>
+<button class="btn btn-dark d-block d-md-none mt-4" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas" style="margin-left: 10px;">Menu</button>
+<div class="main-container d-flex" style="height: 650px;" id="mainContent">
+    <!-- Left Sidebar for Large Devices (Hidden on mobile) -->
+    <div class="left-sidebar d-none d-md-block" style="width: 250px; height: 100%; background-color: #000; color: white; padding: 20px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); flex-shrink: 0;">
+        <h3>Products</h3>
+        <ul class="nav flex-column">
+            {% for category in categories %}
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#" onclick="showItems('{{ category.id }}')">{{ category.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Right Content (Main Product Display Area) -->
+    <div id="productDisplay" class="right-content mx-auto" style="flex-grow: 1; padding: 20px; height: 100%; overflow-y: auto;">
+        <img id="welcomeImage" src="https://media.istockphoto.com/id/521814034/vector/three-kids-in-school-uniform-going-to-school.jpg?s=612x612&w=0&k=20&c=rTIZiRpnkhwdqH23daZmsGPdAWXUpii8koa966rdVwA="
+        class="responsive-image img-fluid"
+        style="width: 300px; height: auto; object-fit: contain;" />
+
+        <h1 id="welcomeText">Welcome to the Products</h1>
+        <div id="productsContainer" class="row d-flex justify-content-start">
+            {% for category, products in products_by_category.items %}
+                <div class="category-section" id="category-{{ category.id }}" style="display: none;">
+                    <h3>{{ category.name }}</h3>
+                    <div class="row">
+                        {% for product in products %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card">
+                                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ product.name }}</h5>
+                                        <p class="card-text">{{ product.description }}</p>
+                                        <p class="card-text">{{ product.price }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination controls -->
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if products.has_previous %}
+                                <a href="?page_{{ category.id }}=1">First</a>
+                                <a href="?page_{{ category.id }}={{ products.previous_page_number }}">Previous</a>
+                            {% endif %}
+
+                            <span class="current">
+                                Page {{ products.number }} of {{ products.paginator.num_pages }}.
+                            </span>
+
+                            {% if products.has_next %}
+                                <a href="?page_{{ category.id }}={{ products.next_page_number }}">Next</a>
+                                <a href="?page_{{ category.id }}={{ products.paginator.num_pages }}">Last</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Offcanvas for Mobile Devices -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel" style="width: 300px;background-color:white;margin-top: 85px;">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasLabel">Products</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="nav flex-column">
+            {% for category in categories %}
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="showItems('{{ category.id }}')">{{ category.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Size Chart Modal -->
+<div class="modal fade" id="sizeChartModal" tabindex="-1" aria-labelledby="sizeChartModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sizeChartModalLabel">Size Chart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img src="https://via.placeholder.com/400x300" alt="Size Chart">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#mainContent').show();
+    });
+
+    function showItems(categoryId) {
+        $('.category-section').hide();
+        $('#welcomeText').hide();
+        $('#welcomeImage').hide();
+        $(`#category-${categoryId}`).show();
+    }
+</script>
+{% endblock %}

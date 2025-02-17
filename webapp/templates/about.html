@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <img src="../../static/assets/image6.jpeg" class="img-fluid" style="height:300px;width:100%;object-fit:contain;"/>
+    </div>
+
+    <div class="mb-4">
+        <h4 class="text-primary">About Orison Distributor</h4>
+        <p class="lead">Orison Distributor is a leading provider of high-quality products and services, specializing in the distribution of a diverse range of goods across various sectors. With a commitment to excellence, we offer reliable, efficient, and cost-effective solutions to meet the needs of our clients. Our extensive network allows us to serve businesses with prompt delivery and top-tier customer support. We are known for our attention to detail and dedication to building lasting relationships. At Orison Distributor, we prioritize customer satisfaction, ensuring that every transaction is smooth and hassle-free. We continually strive for innovation to stay ahead of market trends. Trust us to be your reliable partner in distribution.</p>
+    </div>
+
+    <div class="container mt-5">
+        <div class="row mb-4" id="image-container">
+            <div class="col-3">
+                <img src="../../static/assets/image2.jpeg" class="img-fluid rounded" />
+            </div>
+            <div class="col-3">
+                <img src="../../static/assets/image1.jpeg" class="img-fluid rounded" />
+            </div>
+            <div class="col-3">
+                <img src="../../static/assets/image2.jpeg" class="img-fluid rounded" />
+            </div>
+            <div class="col-3">
+                <img src="../../static/assets/image3.jpeg" class="img-fluid rounded" />
+            </div>
+
+        </div>
+    </div>
+
+    <section class="reviews-section py-5">
+        <!-- <div class="container mt-5"> -->
+            <!-- <form>
+                <div class="mb-3">
+                    <label for="review" class="form-label" style="color: #2d4f85;font-size: 20px;">Your Review</label>
+                    <textarea class="form-control" id="review" rows="4" placeholder="Write your review here" required></textarea>
+                </div>
+                <button type="submit" class="btn text-light" style="background-color: #2d4f85;">Submit Review</button>
+            </form> -->
+        <!-- </div> -->
+        <div class="container">
+            <h2 class="text-center mb-4">What Parents are Saying</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="review-card p-3 mb-4 shadow-sm text-center">
+                        <img src="https://www.nicepng.com/png/detail/52-521023_download-free-icon-female-vectors-blank-facebook-profile.png" alt="Sarah M." class="img-fluid rounded-circle mb-3 border border-2 border-dark" style="width: 80px; height: 80px;">
+                        <p class="review-text">"The uniforms are of great quality, and my kids love them!"</p>
+                        <div class="review-rating mb-2">
+                            <span class="text-warning">&#9733; &#9733; &#9733; &#9733; &#9733;</span>
+                        </div>
+                        <p class="review-author">- Sarah M.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="review-card p-3 mb-4 shadow-sm text-center">
+                        <img src="https://www.nicepng.com/png/detail/52-521023_download-free-icon-female-vectors-blank-facebook-profile.png" alt="John D." class="img-fluid rounded-circle mb-3 border border-2 border-dark" style="width: 80px; height: 80px;">
+                        <p class="review-text">"Affordable and durable uniforms. Highly recommend!"</p>
+                        <div class="review-rating mb-2">
+                            <span class="text-warning">&#9733; &#9733; &#9733; &#9733; &#9733;</span>
+                        </div>
+                        <p class="review-author">- John D.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="review-card p-3 mb-4 shadow-sm text-center">
+                        <img src="https://www.nicepng.com/png/detail/52-521023_download-free-icon-female-vectors-blank-facebook-profile.png" alt="Emily R." class="img-fluid rounded-circle mb-3 border border-2 border-dark" style="width: 80px; height: 80px;">
+                        <p class="review-text">"Amazing customer service and perfect fit for my children."</p>
+                        <div class="review-rating mb-2">
+                            <span class="text-warning">&#9733; &#9733; &#9733; &#9733; &#9733;</span>
+                        </div>
+                        <p class="review-author">- Emily R.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</div>
+
+{% endblock %}
