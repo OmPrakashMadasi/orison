@@ -23,6 +23,7 @@ class School(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
+    numbering = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -36,6 +37,10 @@ class School(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name_plural = "school"
+        ordering = ['numbering']
 
 
 # Create Category model and slug for dynamic urls :-
@@ -54,6 +59,7 @@ class Categories(models.Model):
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='categories', null=True, blank=True)
     description = models.TextField(blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
+    sequence = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if not self.slug:  # Only generate slug if not already set
@@ -66,6 +72,7 @@ class Categories(models.Model):
 
     class Meta:
         verbose_name_plural = "Categories"
+        ordering = ['sequence']
 
 
 class Size(models.Model):
@@ -165,3 +172,15 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} - {self.school.name} - {self.name}"
+
+
+
+
+class Message(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+
+    def __str__(self):
+        return self.subject

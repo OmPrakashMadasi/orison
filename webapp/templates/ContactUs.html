@@ -22,7 +22,7 @@
             </h2>
             <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                 <div class="accordion-body">
-                    Once your order is dispatched, we will provide a tracking link via whatsapp.
+                    Once your order is dispatched, You will be in touch with the Respective Delivery Team.
                 </div>
             </div>
         </div>
@@ -87,31 +87,33 @@
 
         <!-- Right Column: Contact Form -->
         <div class="col-md-7">
-            <div class="card shadow-lg border-0 p-4">
-                <h4 class="mb-3">Send Us a Message</h4>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="name" class="form-label">Your Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required style="width:260px;">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">Your Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                    </div>
-                    <div class="mb-3 mt-3">
-                        <label for="subject" class="form-label">Subject</label>
-                        <input type="text" class="form-control" id="subject" name="subject" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="message" class="form-label">Your Message</label>
-                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-dark">Send Message</button>
-                </form>
+            <!-- my_app/templates/send_message.html -->
+<div class="card shadow-lg border-0 p-4">
+    <h4 class="mb-3">Send Us a Message</h4>
+    <form method="post" action="{% url 'send_message' %}">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Your Name</label>
+                <input type="text" class="form-control" id="name" name="name" required style="width:260px;">
             </div>
+            <div class="col-md-6">
+                <label for="email" class="form-label">Your Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+        </div>
+        <div class="mb-3 mt-3">
+            <label for="subject" class="form-label">Subject</label>
+            <input type="text" class="form-control" id="subject" name="subject" required>
+        </div>
+        <div class="mb-3">
+            <label for="message" class="form-label">Your Message</label>
+            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-dark">Send Message</button>
+    </form>
+</div>
+
         </div>
     </div>
 </div>

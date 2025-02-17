@@ -197,6 +197,20 @@ def contact(request):
     return render(request, 'ContactUs.html',
                   {'schools': schools, 'query': query, 'school': schools.first(), 'cart_count': cart_count})
 
+
+@csrf_exempt
+def send_message(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        email = request.POST['email']
+        subject = request.POST['subject']
+        message = request.POST['message']
+        Message.objects.create(name=name, email=email, subject=subject, message=message)
+        messages.success(request, 'Message sent successfully, We will get in touch!!!')
+        return redirect('contact')
+    messages.error(request, 'Invalid Details')
+    return redirect('home')
+
 def school_detail(request, slug):
     # First, check if a school is stored in the session
     school_slug = request.session.get('school_slug', None)
@@ -215,7 +229,7 @@ def school_detail(request, slug):
     else:
         return redirect('home')  # Redirect to login if the user is not authenticated
 
-    categories = Categories.objects.filter(school=school)
+    categories = Categories.objects.filter(school=school).order_by('sequence')
 
     # Get the user's cart
     cart = get_user_cart(request)
