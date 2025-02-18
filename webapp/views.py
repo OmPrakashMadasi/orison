@@ -15,6 +15,8 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import urllib.parse
 from datetime import datetime, timedelta
+
+
 # Create your views here.
 
 # def regenerate_slugs():
@@ -115,6 +117,7 @@ def login_user(request, slug):
     # Render the login page with schools and selected school context for GET requests
     return render(request, 'registration/login.html', {'schools': schools, 'school': school})
 
+
 def logout_user(request):
     # Clear the school slug from session on logout
     if 'school_slug' in request.session:
@@ -123,8 +126,6 @@ def logout_user(request):
     logout(request)
     messages.success(request, "You have successfully logged out from the Orison world!!!")
     return redirect('home')
-
-
 
 
 def home(request):
@@ -148,7 +149,10 @@ def home(request):
     else:
         cart_count = request.session.get("cart_count", 0)
 
-    return render(request, 'index.html', {'schools': schools, 'query': query, 'school': schools.first(), 'cart_count': cart_count })
+    return render(request, 'index.html',
+                  {'schools': schools, 'query': query, 'school': schools.first(), 'cart_count': cart_count})
+
+
 def about(request):
     schools = School.objects.all()
     query = request.GET.get('query', '')
@@ -170,7 +174,8 @@ def about(request):
     else:
         cart_count = request.session.get("cart_count", 0)
 
-    return render(request,'about.html', {'schools': schools, 'query': query, 'school': schools.first(), 'cart_count': cart_count})
+    return render(request, 'about.html',
+                  {'schools': schools, 'query': query, 'school': schools.first(), 'cart_count': cart_count})
 
 
 def contact(request):
@@ -210,6 +215,7 @@ def send_message(request):
         return redirect('contact')
     messages.error(request, 'Invalid Details')
     return redirect('home')
+
 
 def school_detail(request, slug):
     # First, check if a school is stored in the session
@@ -271,6 +277,7 @@ def get_user_cart(request):
 
     return cart
 
+
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart, created = Cart.objects.get_or_create(user=request.user)
@@ -280,6 +287,11 @@ def add_to_cart(request, product_id):
 
     # Get the quantity from the form input, default to 1 if not provided
     quantity = int(request.POST.get("quantity", 1))
+
+    # Check if there is enough stock of the product
+    if product.stock < quantity:
+        messages.error(request, 'Sorry, we don’t have enough stock of this product!')
+        return redirect("school_detail", slug=product.school.slug)
 
     # Check if the item already exists in the cart with the same size
     cart_item, created = CartItem.objects.get_or_create(
@@ -297,11 +309,16 @@ def add_to_cart(request, product_id):
         cart_item.quantity = quantity
         cart_item.save()
 
+    # Decrease the product stock after adding it to the cart
+    product.stock -= quantity
+    product.save()
+
     # Update the session cart count after modifying the cart
     request.session["cart_count"] = CartItem.objects.filter(cart=cart).count()
 
     messages.success(request, 'Product added to cart!')
     return redirect("school_detail", slug=product.school.slug)
+
 
 def cart_summary(request, slug):
     school = get_object_or_404(School, slug=slug)
@@ -321,23 +338,37 @@ def cart_summary(request, slug):
     }
     return render(request, 'summary/cart_summary.html', context)
 
+
 def remove_from_cart(request, item_id):
     cart = Cart.objects.get(user=request.user)
     cart_item = cart.items.filter(id=item_id).first()
 
     if cart_item:
+        # Get the product associated with the cart item
+        product = cart_item.product
 
+        # Restore the product stock after removal
+        product.stock += cart_item.quantity
+        product.save()
+
+        # Get the school slug for redirection
         school_slug = cart_item.product.school.slug
+
+        # Remove the cart item from the cart
         cart_item.delete()
 
-
+        # Update the session cart count after removal
         request.session['cart_count'] = cart.items.count()
 
+        # Show a success message
         messages.success(request, 'Product is Removed!!!')
+
+        # Redirect back to the cart summary page (or another appropriate page)
         return redirect('cart_summary', slug=school_slug)
 
-        # If no cart item found, fallback to home or another page
+    # If no cart item found, fallback to home or another page
     return redirect('home')
+
 
 @csrf_exempt
 def update_cart_quantity(request):
@@ -356,6 +387,7 @@ def update_cart_quantity(request):
 
     return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
 
+
 def cart_count_api(request):
     cart_count = request.session.get('cart_count', 0)
     return JsonResponse({"cart_count": cart_count})
@@ -366,7 +398,7 @@ def checkout(request, slug):
 
     if request.method == 'POST':
 
-        #get form data
+        # get form data
         name = request.POST.get("name")
         student_class = request.POST.get("class")
         section = request.POST.get("section")
@@ -417,7 +449,7 @@ def checkout(request, slug):
         message = (
             f"Hello {name},\n\n"
             f"Your order has been placed successfully!\n"
-            f"*School:* {school.name}\n" 
+            f"*School:* {school.name}\n"
             f"*Class/Section:*({student_class}/{section})\n"
             f"*Address:* {address}\n"
             f"*Items:*\n{items_message}\n\n"
@@ -435,6 +467,7 @@ def checkout(request, slug):
 
 def custom_404(request, exception):
     return render(request, '404.html', status=404)
+
 
 def custom_500(request):
     return render(request, '500.html', status=500)

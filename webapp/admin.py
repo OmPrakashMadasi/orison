@@ -57,6 +57,7 @@ class ProfileAdmin( ImportExportModelAdmin, admin.ModelAdmin):
     resource_class = CombinedUserProfileResource
     list_display = ('user', 'mobile_number', 'school',)
     list_filter = ('school', )
+    search_fields = ('mobile_number',)
 
 # combine profile info and user info
 class ProfileInline(admin.StackedInline):
