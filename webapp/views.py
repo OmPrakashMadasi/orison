@@ -31,6 +31,7 @@ from datetime import datetime, timedelta
 #         category.slug = generate_category_slug(category.name)
 #         category.save()
 # regenerate_category_slugs()
+
 # Registration views :-
 def register_user(request, slug):
     schools = School.objects.all()
@@ -102,6 +103,11 @@ def login_user(request, slug):
                 profile = Profile.objects.get(user=user)
             except Profile.DoesNotExist:
                 messages.error(request, 'Profile not found for the user.')
+                return redirect('login', slug=slug)
+
+            # Ensure that the profile has a valid school assigned
+            if profile.school is None:
+                messages.error(request, 'The user does not have a valid school assigned.')
                 return redirect('login', slug=slug)
 
             # Check if the user's school matches the selected school

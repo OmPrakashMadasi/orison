@@ -25,6 +25,10 @@ class School(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     numbering = models.IntegerField(default=0)
 
+    def delete(self, *args, **kwargs):
+        self.is_active = False
+        self.save()
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_slug(self.name)

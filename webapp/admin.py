@@ -78,7 +78,7 @@ class SizeInline(admin.TabularInline):
 class CategoriesAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     inlines = [SizeInline, ProductInline]
     list_display = ('name', 'school',)
-    search_fields = ('name', 'school',)
+    search_fields = ('name',)
     list_filter = ('school', 'name',)
 
 admin.site.register(Categories, CategoriesAdmin)
