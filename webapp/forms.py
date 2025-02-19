@@ -57,12 +57,12 @@ class SignUpForm(UserCreationForm):
 
     def clean_password1(self):
         password = self.cleaned_data.get('password1')
-        if len(password) < 8:
-            raise ValidationError('Password must be at least 8 characters long.')
-        if not any(char.isdigit() for char in password):
-            raise ValidationError('Password must contain at least one number.')
-        if not any(char.isalpha() for char in password):
-            raise ValidationError('Password must contain at least one letter.')
+        if len(password) < 4:
+            raise ValidationError('Password must be at least 4 characters long.')
+        # if not any(char.isdigit() for char in password):
+        #     raise ValidationError('Password must contain at least one number.')
+        # if not any(char.isalpha() for char in password):
+        #     raise ValidationError('Password must contain at least one letter.')
         return password
 
     def clean_password2(self):

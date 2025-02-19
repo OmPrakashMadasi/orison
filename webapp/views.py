@@ -75,6 +75,7 @@ def register_user(request, slug):
         return render(request, 'registration/register.html', {'form': form, 'school': school, 'schools': schools})
 
 
+
 def login_user(request, slug):
     # Get the school object by slug
     school = get_object_or_404(School, slug=slug)
@@ -94,34 +95,46 @@ def login_user(request, slug):
         username_or_email_or_mobile = request.POST.get('username_or_email_or_mobile')  # Username/email/mobile input
         password = request.POST['password']
 
-        # Try to authenticate the user directly using username, email, or mobile
-        user = authenticate(request, username=username_or_email_or_mobile, password=password)
+        # Try to authenticate the user using username, email, or mobile number
+        user = None
+
+        # Check if it's an email
+        if '@' in username_or_email_or_mobile:
+            user = User.objects.filter(email=username_or_email_or_mobile).first()
+
+        # Check if it's a mobile number
+        elif username_or_email_or_mobile.isdigit():
+            user = User.objects.filter(profile__mobile_number=username_or_email_or_mobile).first()
+
+        # Otherwise, treat it as a username
+        else:
+            user = User.objects.filter(username=username_or_email_or_mobile).first()
 
         if user:
-            # After authentication, try to retrieve the profile for this user
-            try:
-                profile = Profile.objects.get(user=user)
-            except Profile.DoesNotExist:
-                messages.error(request, 'Profile not found for the user.')
-                return redirect('login', slug=slug)
+            # Authenticate the user with the given password
+            user = authenticate(request, username=user.username, password=password)
+            if user is not None:
+                # Retrieve the profile and check if the user's school matches the selected school
+                try:
+                    profile = Profile.objects.get(user=user)
+                except Profile.DoesNotExist:
+                    messages.error(request, 'Profile not found for the user.')
+                    return redirect('login', slug=slug)
 
-            # Ensure that the profile has a valid school assigned
-            if profile.school is None:
-                messages.error(request, 'The user does not have a valid school assigned.')
-                return redirect('login', slug=slug)
-
-            # Check if the user's school matches the selected school
-            if profile.school.id == school.id:
-                login(request, user)
-                request.session['school_slug'] = school.slug  # Store the school slug in session
-                return redirect('school_detail', slug=school.slug)
+                if profile.school.id == school.id:
+                    login(request, user)
+                    request.session['school_slug'] = school.slug  # Store the school slug in session
+                    return redirect('school_detail', slug=school.slug)
+                else:
+                    messages.error(request, 'The user does not belong to the selected school.')
             else:
-                messages.error(request, 'The user does not belong to the selected school.')
+                messages.error(request, 'Invalid username, email, or password.')
         else:
-            messages.error(request, 'Invalid username, email, or password.')
+            messages.error(request, 'No account found with that username, email, or mobile number.')
 
     # Render the login page with schools and selected school context for GET requests
     return render(request, 'registration/login.html', {'schools': schools, 'school': school})
+
 
 
 def logout_user(request):
