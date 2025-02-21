@@ -57,8 +57,8 @@ class SignUpForm(UserCreationForm):
 
     def clean_password1(self):
         password = self.cleaned_data.get('password1')
-        if len(password) < 4:
-            raise ValidationError('Password must be at least 4 characters long.')
+        # if len(password) < 4:
+        #     raise ValidationError('Password must be at least 4 characters long.')
         # if not any(char.isdigit() for char in password):
         #     raise ValidationError('Password must contain at least one number.')
         # if not any(char.isalpha() for char in password):
@@ -68,6 +68,15 @@ class SignUpForm(UserCreationForm):
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
         password2 = self.cleaned_data.get('password2')
+
+        # Check if either password is None
+        if password1 is None or password2 is None:
+            raise ValidationError('Both password fields are required.')
+
+        # Check if passwords are at least 4 characters long
+        if len(password1) < 4 or len(password2) < 4:
+            raise ValidationError('Password must be at least 4 characters long.')
+
         if password1 != password2:
             raise ValidationError('Passwords do not match')
         return password2
