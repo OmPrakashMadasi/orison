@@ -65,12 +65,31 @@ form button {
   }
 }
 
+.dropdown-menu .school-item {
+  border: 1px solid white;
+  padding: 8px 15px; /* Ensures proper spacing */
+  display: block;
+}
+
+.dropdown-menu .school-item:hover {
+  color: black !important;
+  border-color: black !important;
+  background-color: white !important;
+}
 
 
+.dropdown-menu .school-item {
+  border: 1px solid white;
+  padding: 10px 15px; /* Ensures proper spacing */
+  display: block;
+  margin: 2px 0; /* Adds slight spacing between items */
+}
 
-
-
-
+.dropdown-menu .school-item:hover {
+  color: black !important;
+  border-color: black !important;
+  background-color: white !important;
+}
 
 
 /* //footer.css// */

@@ -416,39 +416,34 @@ def checkout(request, slug):
     school = get_object_or_404(School, slug=slug)
 
     if request.method == 'POST':
-
-        # get form data
+        # Get form data directly from POST
         name = request.POST.get("name")
         student_class = request.POST.get("class")
         section = request.POST.get("section")
         phone = request.POST.get("phone")
         address = request.POST.get("address")
 
+        # # Basic validation (you can expand this)
+        # if not all([name, student_class, section, phone, address]):
+        #     messages.error(request, "All fields are required!")
+        #     return redirect("checkout", slug=slug)  # Assumes a GET redirect to same page
+
         # Get the user's cart
-        cart = Cart.objects.get(user=request.user)
+        try:
+            cart = Cart.objects.get(user=request.user)
+        except Cart.DoesNotExist:
+            messages.error(request, "No cart found!")
+            return redirect("cart_summary", slug=slug)
+
         if not cart.items.exists():
             messages.error(request, "Your cart is empty!")
             return redirect("cart_summary", slug=slug)
 
-        # Format items as a user-friendly string
-        items_text = "\n".join(
-            f"{item.quantity}x {item.product.name} ({item.size.size if item.size else 'No Size'}) - ₹{(item.product.price or 0) * item.quantity}"
-            for item in cart.items.all()
-        )
-        # Format items as a user-friendly string
-        items_message = "\n".join(
-            f"*Product:* {item.product.name}\n*Quantity:* {item.quantity}\n*Size:* {item.size.size if item.size else 'No Size'}\n"
-            for item in cart.items.all()
-        )
-
-        # Calculate total price
+        # Calculate total price from cart
         total_price = sum((item.product.price or 0) * item.quantity for item in cart.items.all())
 
-        # Calculate delivery date (3 days from today)
-        delivery_date = (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')
-
         # Create the order
-        Order.objects.create(
+        order = Order.objects.create(
             user=request.user,
             school=school,
             name=name,
@@ -456,32 +451,54 @@ def checkout(request, slug):
             section=section,
             phone=phone,
             address=address,
-            total_price=total_price,
-            items=items_text,
+            total_price=total_price,  # Set initially from cart
+        )
+
+        # Transfer cart items to OrderItem
+        for cart_item in cart.items.all():
+            product_price = cart_item.product.price or 0  # Ensure price is not None
+            OrderItem.objects.create(
+                order=order,
+                product=cart_item.product,
+                quantity=cart_item.quantity,
+                size=cart_item.size,
+                price=product_price,  # Use actual product price
+            )
+
+        # Format items for WhatsApp message
+        items_message = "\n".join(
+            f"*Product:* {item.product.name}\n*Quantity:* {item.quantity}\n*Size:* {item.size.size if item.size else 'No Size'}\n*Price:* ₹{(item.product.price or 0) * item.quantity}"
+            for item in cart.items.all()
         )
 
         # Clear the cart
         cart.items.all().delete()
-        request.session["cart_count"] = 0  # Reset session cart count
+        request.session["cart_count"] = 0
 
-        # Create WhatsApp message link
+        # Calculate delivery date
+        delivery_date = (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')
+
+        # Create WhatsApp message
         message = (
             f"Hello {name},\n\n"
-            f"Your order has been placed successfully!\n"
+            f"your order will be ready to pickup from the store , payment to be done during the delivery time\n"
             f"*School:* {school.name}\n"
             f"*Class/Section:*({student_class}/{section})\n"
             f"*Address:* {address}\n"
-            f"*Items:*\n{items_message}\n\n"
-            f"*Expected Delivery Date:* {delivery_date}\n\n"
+            f"*Items:*\n{items_message}\n"
+            f"*Total Price:* ₹{total_price}\n"
+            f"*Delivery Date:* {delivery_date}\n\n"
             f"Thank you for shopping with us!"
         )
         encoded_message = urllib.parse.quote(message)
-        whatsapp_link = f"https://wa.me/+919550590693?text={encoded_message}"
+        whatsapp_link = f"https://wa.me/+919550590693?text={encoded_message}"  # Hardcoded as per your original
 
         messages.success(request, f"Order placed successfully!")
-        return redirect(whatsapp_link)  # Redirect to homepage after order is placed
+        return redirect(whatsapp_link)
 
-    return redirect("home", slug=slug)
+    # For GET requests, you’d need a template (not provided in your original)
+    return redirect("home", slug=slug)  # Fallback as per your original
+
 
 
 def custom_404(request, exception):

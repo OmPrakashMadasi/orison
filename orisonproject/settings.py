@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'import_export',
     "admin_interface",
     "colorfield",
+    'django_select2',
 ]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
