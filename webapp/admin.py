@@ -5,6 +5,7 @@ from .models import *
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from .resources import *
 from django_select2.forms import Select2Widget
+from django.utils.html import format_html
 # Inline definitions
 class ProductInline(admin.TabularInline):
     model = Product
@@ -132,14 +133,24 @@ class CartAdmin(admin.ModelAdmin):
 
 class OrderAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = OrderResource
-    list_display = ('id', 'name', 'school', 'phone', 'created_at')
+    list_display = ('id', 'name', 'school', 'phone', 'created_at', 'token', 'show_barcode')
     list_filter = ('school','order_status', 'payment_status')
     search_fields = ('phone', 'name', 'school__name')
-    readonly_fields = ('created_at', )
-    fields = ('user', 'school', 'name', 'student_class', 'section', 'phone', 'address', 'total_price', 'order_status', 'payment_status')
+    readonly_fields = ('created_at', 'barcode_image')
+    # readonly_fields = ('created_at', 'show_barcode')
+    fields = ('user', 'school', 'name', 'student_class', 'section', 'phone', 'address', 'total_price', 'order_status', 'payment_status', 'barcode_image')
     inlines = [OrderItemInline]
     list_per_page = 20
     ordering = ['-id']
+    def show_barcode(self, obj):
+        if obj.barcode_image:
+            return format_html('<img src="{}" width="100" height="100" alt="QR Code" />', obj.barcode_image.url)
+        elif obj.token:
+            url = f"/barcode/{obj.token}/"
+            return format_html('<img src="{}" width="100" height="100" alt="QR Code" />', url)
+        return "No QR code available"
+
+    show_barcode.short_description = "Barcode"
 
     def get_form(self, request, obj=None, **kwargs):
         # Set default school based on user's Profile when adding a new Order

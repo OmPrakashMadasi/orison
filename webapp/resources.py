@@ -1,4 +1,6 @@
 from import_export import resources
+from twisted.words.protocols.irc import attributes
+
 from .models import *
 
 # Resource for User model
@@ -47,6 +49,7 @@ class OrderResource(resources.ModelResource):
     created_at = resources.Field(attribute='created_at', column_name='Created At')
     order_status = resources.Field(attribute='order_status', column_name='Order Status')
     payment_status = resources.Field(attribute='payment_status', column_name='Payment Status')
+    barcode_image = resources.Field(attribute='barcode_image', column_name='barcode_image')
     items = resources.Field(column_name='Items')
 
     def dehydrate_items(self, order):
@@ -65,11 +68,11 @@ class OrderResource(resources.ModelResource):
         model = Order
         fields = (
             'order_id', 'username', 'email', 'school_name', 'student_name', 'student_class',
-            'section', 'phone', 'address', 'items', 'total_price', 'created_at', 'order_status', 'payment_status'
+            'section', 'phone', 'address', 'items', 'total_price', 'created_at', 'order_status', 'payment_status', 'barcode_image'
         )
         export_order = (
             'order_id', 'username', 'email', 'school_name', 'student_name', 'student_class',
-            'section', 'phone', 'address', 'items', 'total_price', 'created_at', 'order_status', 'payment_status'
+            'section', 'phone', 'address', 'items', 'total_price', 'created_at', 'order_status', 'payment_status', 'barcode_image'
         )
 
 # Optionally, add resources for other models if needed (e.g., School, Product)

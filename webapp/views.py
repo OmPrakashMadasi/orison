@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import *
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -15,7 +15,9 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import urllib.parse
 from datetime import datetime, timedelta
-
+import qrcode
+from django.conf import settings
+import os
 
 # Create your views here.
 
@@ -465,15 +467,16 @@ def checkout(request, slug):
                 price=product_price,  # Use actual product price
             )
 
+        # Generate QR code by calling the view function
+        generate_barcode(request, order.token)  # This saves barcode_image
+
         # Format items for WhatsApp message
         items_message = "\n".join(
             f"*Product:* {item.product.name}\n*Quantity:* {item.quantity}\n*Size:* {item.size.size if item.size else 'No Size'}\n*Price:* ₹{(item.product.price or 0) * item.quantity}"
             for item in cart.items.all()
         )
 
-        # Clear the cart
-        cart.items.all().delete()
-        request.session["cart_count"] = 0
+
 
         # Calculate delivery date
         delivery_date = (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')
@@ -488,10 +491,15 @@ def checkout(request, slug):
             f"*Items:*\n{items_message}\n"
             f"*Total Price:* ₹{total_price}\n"
             f"*Delivery Date:* {delivery_date}\n\n"
+            f"Scan QR for details: http://127.0.0.1:8000/order-api/{order.token}/\n"
             f"Thank you for shopping with us!"
         )
         encoded_message = urllib.parse.quote(message)
         whatsapp_link = f"https://wa.me/+919550590693?text={encoded_message}"  # Hardcoded as per your original
+
+        # Clear the cart
+        cart.items.all().delete()
+        request.session["cart_count"] = 0
 
         messages.success(request, f"Order placed successfully!")
         return redirect(whatsapp_link)
@@ -500,6 +508,45 @@ def checkout(request, slug):
     return redirect("home", slug=slug)  # Fallback as per your original
 
 
+# Add generate_barcode view
+def generate_barcode(request, token):
+    order = get_object_or_404(Order, token=token)
+    base_url = "http://127.0.0.1:8000"
+    data = (
+        f"Order ID: {order.id}\n"
+        f"School: {order.school.name}\n"
+        f"Student: {order.name}\n"
+        f"Class/Section: {order.student_class}/{order.section}\n"
+        f"Phone: {order.phone}\n"
+        f"Address: {order.address}\n"
+        f"Total: ₹{order.total_price}\n"
+        f"Status: {order.order_status}\n"
+        f"Payment: {order.payment_status}\n"
+        f"{base_url}/order-api/{order.token}/"
+    )
+    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=8, border=6)
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="darkblue", back_color="lightgray")
+
+    barcode_filename = f"barcodes/order_{order.id}.png"
+    barcode_path = os.path.join(settings.MEDIA_ROOT, barcode_filename)
+    os.makedirs(os.path.dirname(barcode_path), exist_ok=True)
+    if os.path.exists(barcode_path):
+        os.remove(barcode_path)
+    img.save(barcode_path)
+    Order.objects.filter(id=order.id).update(barcode_image=barcode_filename)
+
+    response = HttpResponse(content_type="image/png")
+    response['Content-Disposition'] = f'attachment; filename="order_{order.id}_qrcode.png"'
+    img.save(response, "PNG")
+    return response
+
+# Add order_detail_api view
+def order_detail_api(request, token):
+    order = get_object_or_404(Order, token=token)
+    items = order.order_items.all()
+    return render(request, 'summary/order_details.html', {'order': order, 'items': items})
 
 def custom_404(request, exception):
     return render(request, '404.html', status=404)

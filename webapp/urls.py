@@ -27,4 +27,8 @@ urlpatterns = [
     path('cart/count/', cart_count_api, name='cart_count_api'),
     path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+
+    #QR Code URLS
+    path('barcode/<uuid:token>/', views.generate_barcode, name='generate_barcode'),
+    path('order-api/<uuid:token>/', views.order_detail_api, name='order_detail_api'),
 ]

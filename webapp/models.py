@@ -190,6 +190,17 @@ class Order(models.Model):
         ('failed', 'Payment Failed'),
     )
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
+    token = models.UUIDField(null=True, blank=True, unique=True, editable=False)  # Added token
+    barcode_image = models.ImageField(upload_to='barcodes/', null=True, blank=True)  # Confirmed added
+
+    def save(self, *args, **kwargs):
+        # Ensure a unique token is generated if not already set
+        if not self.token:
+            self.token = uuid4()
+            # Check for uniqueness explicitly to avoid rare collisions
+            while Order.objects.filter(token=self.token).exists():
+                self.token = uuid4()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Order {self.id} - {self.school.name} - {self.name}"
