@@ -250,9 +250,12 @@ def school_detail(request, slug):
 
     # Check if the logged-in user belongs to the school being viewed
     if request.user.is_authenticated:
-        user_profile = Profile.objects.get(user=request.user)
-        if user_profile.school.slug != school.slug:
-            return redirect('login')  # Redirect to login or show an error message
+
+        user_profile = Profile.objects.filter(user=request.user).first()
+
+        if not user_profile or user_profile.school.slug != school.slug:
+            return redirect('login')
+
     else:
         return redirect('home')  # Redirect to login if the user is not authenticated
 
@@ -547,6 +550,71 @@ def order_detail_api(request, token):
     order = get_object_or_404(Order, token=token)
     items = order.order_items.all()
     return render(request, 'summary/order_details.html', {'order': order, 'items': items})
+
+def orderspage(request, slug):
+    school = get_object_or_404(School, slug=slug)
+    order = Order.objects.filter(school=school).prefetch_related('order_items__product').order_by('-created_at')
+
+    # Calculate cart count
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        cart_count = cart.items.count()
+    else:
+        cart_count = request.session.get("cart_count", 0)
+
+    return render(request, 'summary/orderspage.html', {'order': order, 'school': school, 'cart_count': cart_count})
+
+
+def profilepage(request, slug=None):
+    if not request.user.is_authenticated:
+        messages.error(request, 'Please login to access your profile.')
+        return redirect('login', slug=slug)
+
+    user = request.user
+    profile, created = Profile.objects.get_or_create(user=user)
+    school = get_object_or_404(School, slug=slug) if slug else None
+
+    # Calculate cart count
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        cart_count = cart.items.count()
+    else:
+        cart_count = request.session.get("cart_count", 0)
+
+    if request.method == "POST":
+        form = UserInfoForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            # Update User model fields
+            user.username = form.cleaned_data['username']
+            user.email = form.cleaned_data['email']
+            user.save()
+
+            # Update Profile model fields
+            profile = form.save(commit=False)  # Save Profile fields from the form
+            if 'profile_picture' in request.FILES:
+                profile.profile_picture = request.FILES['profile_picture']
+            profile.save()
+
+            messages.success(request, "Profile updated successfully!")
+            return redirect('profilepage', slug=school.slug if school else None)
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+    else:
+        form = UserInfoForm(instance=profile)
+
+    context = {
+        "form": form,
+        "user": user,
+        "profile": profile,
+        "school": school,
+        "cart_count": cart_count,  # Include cart count
+    }
+    return render(request, "summary/profilepage.html", context)
+
+
 
 def custom_404(request, exception):
     return render(request, '404.html', status=404)

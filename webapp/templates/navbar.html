@@ -1,4 +1,11 @@
 {% load static %}
+<style>
+  @media (max-width: 991px) { /* Apply only on mobile */
+  .offcanvas-half {
+    width: 50% !important; /* Make it take only half the screen */
+  }
+}
+</style>
 <nav class="navbar navbar-expand-lg" style="font-size:18px;">
   <div class="container-fluid px-3">
     <a class="navbar-brand" href="{% url 'home' %}">
@@ -6,6 +13,7 @@
         style="width:150px; height:auto; border-radius:50%;">
     </a>
 
+    <!-- Mobile Icons (Cart & Logout) -->
     <div class="d-flex d-lg-none align-items-center gap-3 ms-auto">
       {% if not user.is_authenticated %}
       <form class="d-flex" role="search" method="get">
@@ -26,30 +34,55 @@
       </button>
     </div>
 
-    <div class="offcanvas offcanvas-start bg-dark text-white d-lg-none" tabindex="-1" id="offcanvasNavbar">
+    <!-- Mobile Offcanvas Menu -->
+    <div class="offcanvas offcanvas-start offcanvas-half bg-dark text-white d-lg-none" tabindex="-1" id="offcanvasNavbar">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title">Menu</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
       </div>
       <div class="offcanvas-body">
+
+        <!-- Profile Section in Mobile -->
+        {% if user.is_authenticated %}
+        <div class="d-flex align-items-center gap-3">
+          <div class="dropdown">
+          <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown">
+          <img src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}{% static 'images/dummy.png' %}{% endif %}"
+            alt="Profile Picture" class="rounded-circle profile-img" width="40" height="40">
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="profileDropdown" style="color:white">
+            <li><a class="dropdown-item" href="{% url 'profilepage' slug=school.slug %}"><i class="bi bi-person-lines-fill text-success"></i> Profile</a></li>
+<!--            <li><a class="dropdown-item" href="#"><i class="bi bi-card-checklist text-primary"></i> Your Address</a></li>-->
+            <li><a class="dropdown-item" href="{% url 'orderspage' slug=school.slug %}"><i class="bi bi-receipt-cutoff text-warning"></i> Orders <i class="bi bi-caret-right-fill"></i></a></li>
+          </ul>
+        </div>
+          <div>
+            <strong class="text-white">{{ user.username }}</strong>
+            <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm d-block mt-1">Log-Out</a>
+          </div>
+        </div>
+        <hr>
+        {% endif %}
+
+        <!-- Navigation Links -->
         <ul class="navbar-nav mx-auto gap-2">
           <li class="nav-item"><a class="nav-link text-white" href="{% url 'home' %}">Home</a></li>
           <li class="nav-item"><a class="nav-link text-white" href="{% url 'about' %}">About Us</a></li>
           <li class="nav-item"><a class="nav-link text-white" href="{% url 'contact' %}">Contact Us</a></li>
+<!--          <li class="nav-item"><a class="nav-link text-white" href="#products">Schools</a></li>-->
           {% if user.is_authenticated and school %}
           <li class="nav-item"><a class="nav-link text-white"
               href="{% url 'school_detail' slug=school.slug %}">Products</a></li>
           {% else %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Schools</a>
-            <ul class="dropdown-menu text-white" style="background-color:#2F3720; margin-top:25px; border: 1px solid white;padding: 10px;">
-              {% for school in schools %}
-              <li>
-                <a class="dropdown-item text-white school-item" href="{% url 'register' slug=school.slug %}">
-                  {{ school.name }}
-                </a>
-              </li>
-              {% endfor %}
+          <li class="nav-item"><a class="nav-link text-white" href="{% url 'home' %}#products">Schools</a></li>
+<!--          <li class="nav-item dropdown">-->
+<!--            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Schools</a>-->
+<!--            <ul class="dropdown-menu text-white" style="background-color:#2F3720; margin-top:25px; border: 1px solid white;padding: 10px;">-->
+<!--              {% for school in schools %}-->
+<!--              <li>-->
+<!--                <a class="dropdown-item text-white school-item" href="{% url 'register' slug=school.slug %}">{{ school.name }}</a>-->
+<!--              </li>-->
+<!--              {% endfor %}-->
             </ul>
           </li>
           {% endif %}
@@ -57,33 +90,47 @@
       </div>
     </div>
 
+    <!-- Desktop Navbar -->
     <div class="collapse navbar-collapse d-none d-lg-flex" id="navbarNav">
       <ul class="navbar-nav mx-auto d-flex flex-row gap-4">
         <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About Us</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact Us</a></li>
+<!--        <li class="nav-item"><a class="nav-link" href="#products">Schools</a></li>-->
         {% if user.is_authenticated and school %}
         <li class="nav-item"><a class="nav-link" href="{% url 'school_detail' slug=school.slug %}">Products</a></li>
+
+        <!-- Profile Dropdown -->
+        <div class="dropdown" style="color:white">
+          <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown">
+            <img src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}{% static 'images/dummy.png' %}{% endif %}"
+              alt="Profile Picture" class="rounded-circle profile-img" width="40" height="40">
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+            <li><a class="dropdown-item" href="{% url 'profilepage' slug=school.slug %}"><i class="bi bi-person-lines-fill text-success"></i> Profile</a></li>
+<!--            <li><a class="dropdown-item" href="#"><i class="bi bi-card-checklist text-primary"></i> Your Address</a></li>-->
+            <li><a class="dropdown-item" href="{% url 'orderspage' slug=school.slug %}"><i class="bi bi-receipt-cutoff text-warning"></i> Orders <i class="bi bi-caret-right-fill"></i></a></li>
+          </ul>
+        </div>
         {% else %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Schools</a>
-          <ul class="dropdown-menu text-white p-3" style="background-color:#2F3720; margin-top:25px; border: 1px solid white;">
-            {% for school in schools %}
-            <li>
-              <a class="dropdown-item text-white school-item" href="{% url 'register' slug=school.slug %}">
-                {{ school.name }}
-              </a>
-            </li>
-            {% endfor %}
+          <li class="nav-item"><a class="nav-link text-white" href="{% url 'home' %}#products">Schools</a></li>
+<!--        <li class="nav-item dropdown">-->
+<!--          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Schools</a>-->
+<!--          <ul class="dropdown-menu text-white p-3" style="background-color:#2F3720; margin-top:25px; border: 1px solid white;">-->
+<!--            {% for school in schools %}-->
+<!--            <li>-->
+<!--              <a class="dropdown-item text-white school-item" href="{% url 'register' slug=school.slug %}">{{ school.name }}</a>-->
+<!--            </li>-->
+<!--            {% endfor %}-->
           </ul>
         </li>
         {% endif %}
       </ul>
+
       <div class="d-flex align-items-center gap-4 ms-auto">
         {% if not user.is_authenticated %}
         <form class="d-flex" role="search" method="get">
-          <input class="form-control me-2" type="text" name="query" placeholder="Search..." required
-            style="width:250px;">
+          <input class="form-control me-2" type="text" name="query" placeholder="Search..." required style="width:250px;">
           <button class="btn btn-outline-light" type="submit">Search</button>
         </form>
         {% else %}

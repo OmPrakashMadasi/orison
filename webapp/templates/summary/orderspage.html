@@ -1,10 +1,174 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+
+    .container {
+        max-width: 95%;
+        margin: auto;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    /* Responsive table */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    /* Product Image */
+    .product-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    /* Mobile-friendly cards */
+    .order-card {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        table {
+            display: none; /* Hide table on small screens */
+        }
+
+        .order-card {
+            display: block;
+            background: white;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-card p {
+            margin: 5px 0;
+        }
+
+        .order-card strong {
+            color: #007bff;
+        }
+
+        .order-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            display: block;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+        }
+    }
+</style>
+
+<div class="container">
+    <h1>Orders List</h1>
+
+    <!-- Desktop Table -->
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+<!--                    <th>Order ID</th>-->
+                    <th>School</th>
+                    <th>Student Name</th>
+                    <th>Class</th>
+                    <th>Section</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Items</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in order %}
+                <tr>
+<!--                    <td>{{ order.id }}</td>-->
+                    <td>{{ order.school.name }}</td>
+                    <td>{{ order.name }}</td>
+                    <td>{{ order.student_class }}</td>
+                    <td>{{ order.section }}</td>
+                    <td>{{ order.phone }}</td>
+                    <td>{{ order.address }}</td>
+                    <td>
+                        <ul>
+                            {% for item in order.order_items.all %}
+                            <li class="p-3 text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3" style="list-style-type:none;">{{ item.product.name }}  </li>
+                            <li>(Qty: {{ item.quantity }})</li>
+                            <li>(size: {{ item.size }})</li>
+                            {% empty %}
+                            <li>No items</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center;">No orders available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile Cards -->
+    {% for order in order %}
+    <div class="order-card">
+<!--        <p><strong>Order ID:</strong> {{ order.id }}</p>-->
+        <p><strong>School:</strong> {{ order.school.name }}</p>
+        <p><strong>Student:</strong> {{ order.name }}</p>
+        <p><strong>Class:</strong> {{ order.student_class }}</p>
+        <p><strong>Section:</strong> {{ order.section }}</p>
+        <p><strong>Phone:</strong> {{ order.phone }}</p>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <p><strong>Items:</strong></p>
+        <ul>
+            {% for item in order.order_items.all %}
+            <li class="p-3 text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3" style="list-style-type:none;">{{ item.product.name }}  </li>
+            <li>(Qty: {{ item.quantity }})</li>
+            <li>(size: {{ item.size }})</li>
+            {% empty %}
+            <li>No items</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% empty %}
+    <div class="order-card" style="text-align: center;">
+        <p>No orders available.</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

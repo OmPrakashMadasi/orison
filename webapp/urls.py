@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import cart_count_api
+from .views import cart_summary
 from . import views
 from django.contrib.auth import views as auth_views
 urlpatterns = [
@@ -31,4 +32,9 @@ urlpatterns = [
     #QR Code URLS
     path('barcode/<uuid:token>/', views.generate_barcode, name='generate_barcode'),
     path('order-api/<uuid:token>/', views.order_detail_api, name='order_detail_api'),
+    path('school/<slug:slug>/orderspage/',views.orderspage, name='orderspage'),
+    path('school/<slug:slug>/profilepage/', views.profilepage, name='profilepage'),
+    # path('school/<slug:slug>/update-password', views.update_password, name='update_password'),
+    # path('school/<slug:slug>/update-user', views.update_user, name='update_user'),
+    path('school/<slug:slug>/cart/', cart_summary, name='cart_summary'),
 ]

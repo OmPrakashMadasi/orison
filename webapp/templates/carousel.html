@@ -1,4 +1,24 @@
 {% load static %}
+<style>
+      .btn-shop {
+    background-color: #b22222;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    display: block;
+    margin: 5px auto;
+  }
+
+  .btn-shop:hover {
+    background-color: #8b1a1a;
+  }
+</style>
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
 
   <div class="carousel-inner">
@@ -33,44 +53,26 @@
     <span class="visually-hidden">Next</span>
   </button>
 </div>
-
-<div class="container text-center mt-5">
+{% if not user.is_authenticated %}
+<div class="container text-center mt-5" id="products" >
   <h3 class="mb-4" style="max-width: 400px; margin: 0 auto; text-align: center; color: brown; padding: 5px;">
     Esteemed School Networks
   </h3>
-  <div class="scroll-container">
-    <div class="scroll-content-wrapper">
-      <div class="scroll-content">
-        <img
-          src="{% static 'images/hyderabad-public-school.jpg' %}"
-          alt="hyderabad-public-school" class="school-logo">
-        <img
-          src="{% static 'images/St.Peters-model-school.png' %}"
-          alt="St.Peters-model-school" class="school-logo">
-        <img
-          src="{% static 'images/sujatha-public-school.jpeg' %}"
-          alt="sujatha-public-school" class="school-logo">
-        <img
-          src="{% static 'images/delhi-public-school_Mge32nF.png' %}"
-          alt="delhi-public-school" class="school-logo">
-
-        <!-- Duplicating images for infinite loop effect -->
-        <img
-          src="{% static 'images/hyderabad-public-school.jpg' %}"
-          alt="hyderabad-public-school" class="school-logo">
-        <img
-          src="{% static 'images/St.Peters-model-school.png' %}"
-          alt="St.Peters-model-school" class="school-logo">
-        <img
-          src="{% static 'images/sujatha-public-school.jpeg' %}"
-          alt="sujatha-public-school" class="school-logo">
-        <img
-          src="{% static 'images/delhi-public-school_Mge32nF.png' %}"
-          alt="delhi-public-school" class="school-logo">
-      </div>
+    <div class="container">
+    <div class="row justify-content-center">
+        {% for school in schools %}
+        <div class="col-auto card p-1 border shadow-sm text-center">
+            <div style="display: flex; justify-content: center;">
+                <img src="{{ school.image.url }}" alt="{{ school.name }}" class="school-logo">
+            </div>
+            <h6 class="mt-2 small">{{ school.name }}</h6>
+            <button onclick="window.location.href='{% url 'register' slug=school.slug %}'" class="btn-shop">shop now</button>
+        </div>
+        {% endfor %}
     </div>
-  </div>
+        {% endif %}
 </div>
+
 
 <div class="container py-5">
   <h2 class="text-center mb-4">Categories</h2>
